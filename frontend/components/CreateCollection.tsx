@@ -6,17 +6,17 @@ import {
   Button,
   Box,
   Image,
+  Switch,
   Spinner,
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import styles from "../styles/Create.module.css";
-import { AddIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { Web3Storage } from "web3.storage";
 import SuccessLottie from "@components/SuccessLottie";
 import Link from "next/link";
-import { TokenMetadata } from "@utils/types";
-import { createAsset } from "@utils/web3";
+import { CollectionMetadata } from "@utils/types";
+import { InfoIcon } from "@chakra-ui/icons";
 import { useTron } from "@components/TronProvider";
 
 const WEB3_STORAGE_TOKEN = process.env.NEXT_PUBLIC_WEB3_STORAGE_API_KEY;
@@ -26,18 +26,23 @@ const client = new Web3Storage({
   endpoint: new URL("https://api.web3.storage"),
 });
 
-function CreateToken() {
+function CreateCollection() {
   const { address } = useTron();
   const [uploadedImage, setUploadedImage] = useState<any>();
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [publishedContract, setPublishedContract] = useState<string>("");
+
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [collection, setCollection] = useState<string>("");
   const [externalURL, setExternalURL] = useState<string>("");
-  const [trait, setTrait] = useState<string>("");
-  const [value, setValue] = useState<string>("");
+  const [baseURI, setBaseURI] = useState<string>("");
+  const [tokenSupply, setTokenSupply] = useState<number>();
+  const [symbol, setSymbol] = useState<string>("");
+  const [royalties, setRoyalties] = useState<string>("");
   const [txnHash, setTxnHash] = useState<string>("");
-  const [secret, setSecret] = useState<string>("");
+
+  const [isViewSuccessPage, setViewSuccessPage] = useState<boolean>(false);
 
   function handleImageUpload(e) {
     setUploadedImage(e.target.files[0]);
@@ -51,24 +56,20 @@ function CreateToken() {
     setDescription(e.target.value);
   }
 
-  function handleCollectionChange(e) {
-    setCollection(e.target.value);
+  function handleBaseURIChange(e) {
+    setBaseURI(e.target.value);
   }
 
-  function handleExternalURLChange(e) {
-    setExternalURL(e.target.value);
+  function handleSymbolChange(e) {
+    setSymbol(e.target.value);
   }
 
-  function handleTraitChange(e) {
-    setTrait(e.target.value);
+  function handleRoyaltiesChange(e) {
+    setRoyalties(e.target.value);
   }
 
-  function handleValueChange(e) {
-    setValue(e.target.value);
-  }
-
-  function handleSecretChange(e) {
-    setSecret(e.target.value);
+  function handleTokenSupplyChange(e) {
+    setTokenSupply(e.target.value);
   }
 
   const NFT_ADDRESS = "";
@@ -84,26 +85,20 @@ function CreateToken() {
     return imageLink;
   }
 
-  const lastTokenId = 0;
-
   async function uploadJSON() {
     const imageCID = await uploadImage();
 
     // construct JSON metadata object
-    const jsonObject: TokenMetadata = {
+    const jsonObject: CollectionMetadata = {
       name: name,
       description: description,
-      collection: collection != "" ? collection : "SealKey Collection 1",
-      external_url: externalURL,
+      symbol: symbol,
+      base_uri: baseURI,
       image:
         imageCID ??
         "https://bafybeie6rfxujzadhx5t3ofso6sckg33jknl5vhobmgby7uetpmbzaojvm.ipfs.w3s.link/preview.png",
-      attributes: [
-        {
-          trait_type: trait,
-          value: value,
-        },
-      ],
+      seller_fee_basis_points: royalties.toString(),
+      fee_recipient: address,
     };
 
     const blob = new Blob([JSON.stringify(jsonObject)], {
@@ -117,57 +112,38 @@ function CreateToken() {
     return { jsonLink, jsonObject };
   }
 
-  // const handleMint = () => {}
+  //   const handleDeploy = () => {}
 
-  // async function handleListAsset() {
-  //   setLoading(true);
-  //   const { jsonLink: uploadedJSON, jsonObject: metadata } = await uploadJSON();
-  //   console.log("TokenMetadata successfully uploaded to IPFS: ", uploadedJSON);
-  //   const nftResult = await handleMint(uploadedJSON);
+  //   async function deployContract() {
+  //     if (!signer) return;
+  //     setLoading(true);
 
-  // if (nftResult) {
-  //   await createAsset(
-  //     NFT_ADDRESS,
-  //     (parseInt(lastTokenId as string, 10) + 1).toString(),
-  //     metadata,
-  //     address
-  //   );
-  // }
-  //   setLoading(false);
-  // }
+  //     try {
+  //       const { jsonLink: uploadedJSON, jsonObject: metadata } =
+  //         await uploadJSON();
 
-  // const navigationLink = useMemo(
-  //   () =>
-  //     lastTokenId
-  //       ? `/collection/${NFT_ADDRESS}/${
-  //           parseInt(lastTokenId as string, 10) + 1
-  //         }`
-  //       : `/collection/${NFT_ADDRESS}`,
-  //   [NFT_ADDRESS, lastTokenId]
-  // );
+  //       console.log("collection metdata successfully uploaded: ", uploadedJSON);
 
-  const navigationLink = "";
-  const handleListAsset = () => {};
+  //       const contract = ...
+  //       console.log("contract deployed");
+  //       console.log("contract address: ", contract.address);
 
-  if (!address) {
-    return (
-      <VStack className={styles.main}>
-        <VStack w="100%">
-          <Text className={styles.title}>Oops! Wait a minute.</Text>
-          <Text className={styles.inputHeader}>
-            Please connect your wallet before you proceed.
-          </Text>
-        </VStack>
-      </VStack>
-    );
-  }
+  //       setPublishedContract(contract.address);
+  //       // saveContract(contract.address, imageURI);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //     setLoading(false);
+  //   }
 
-  if (txnHash) {
+  const deployContract = () => {};
+
+  if (publishedContract) {
     return (
       <main className={styles.main}>
         <VStack>
           <HStack pb="2rem">
-            <Text className={styles.title}>CREATE NEW ITEM</Text>
+            <Text className={styles.title}>CREATE NEW COLLECTION</Text>
           </HStack>
           <VStack h="400px" position="relative">
             <VStack className={styles.lottieContainer}>
@@ -175,18 +151,18 @@ function CreateToken() {
             </VStack>
           </VStack>
           <Text fontSize="16px" pb="1rem">
-            Your token was successfully minted.
+            Your collection was successfully deployed.
           </Text>
 
           <HStack>
             <ChakraLink
-              href={`https://tronscan.org/#/transaction/${txnHash}`}
+              href={`https://explorer.testnet.mantle.xyz/address/${publishedContract}`}
               isExternal
             >
-              <Button className={styles.successButton}>View transaction</Button>
+              <Button className={styles.successButton}>View contract</Button>
             </ChakraLink>
-            <Link href={navigationLink}>
-              <Button className={styles.successButton}>View token</Button>
+            <Link href={`/collection/${publishedContract}`}>
+              <Button className={styles.successButton}>View collection</Button>
             </Link>
           </HStack>
         </VStack>
@@ -198,12 +174,12 @@ function CreateToken() {
     <main className={styles.main}>
       <VStack>
         <HStack pb="2rem">
-          <Text className={styles.title}>CREATE NEW ITEM</Text>
+          <Text className={styles.title}>CREATE NEW COLLECTION</Text>
         </HStack>
         <HStack gap={10} alignItems="flex-start">
           <VStack gap={2}>
             <VStack>
-              <Text w="100%">Media</Text>
+              <Text w="100%">Cover Image</Text>
               {!uploadedImage ? (
                 <VStack className={styles.uploadContainer}>
                   <input
@@ -234,34 +210,14 @@ function CreateToken() {
                 ></Image>
               )}
             </VStack>
-            <VStack>
-              <HStack
-                w="100%"
-                justifyContent="space-between"
-                alignItems="flex-end"
-                paddingRight=".5rem"
-              >
-                <Text>Properties</Text>
-                <AddIcon w={3} h={3} cursor="pointer" />
-              </HStack>
-              <HStack>
-                <VStack alignItems="flex-start">
-                  <Text className={styles.inputSubtitle}>Trait name</Text>
-                  <Input
-                    className={styles.subinput}
-                    onChange={handleTraitChange}
-                    value={trait}
-                  ></Input>
-                </VStack>
-                <VStack alignItems="flex-start">
-                  <Text className={styles.inputSubtitle}>Value</Text>
-                  <Input
-                    className={styles.subinput}
-                    onChange={handleValueChange}
-                    value={value}
-                  ></Input>
-                </VStack>
-              </HStack>
+            <VStack alignItems="flex-start">
+              <Text>Token Supply</Text>
+              <Input
+                className={styles.input}
+                onChange={handleTokenSupplyChange}
+                value={tokenSupply}
+                placeholder="10"
+              ></Input>
             </VStack>
           </VStack>
           <VStack alignItems="flex-end" gap={1}>
@@ -274,8 +230,15 @@ function CreateToken() {
               ></Input>
             </VStack>
             <VStack alignItems="flex-start">
+              <Text>Symbol</Text>
+              <Input
+                className={styles.input}
+                onChange={handleSymbolChange}
+                value={symbol}
+              ></Input>
+            </VStack>
+            <VStack alignItems="flex-start">
               <Text>Description</Text>
-
               <Input
                 className={styles.input}
                 onChange={handleDescriptionChange}
@@ -283,33 +246,40 @@ function CreateToken() {
               ></Input>
             </VStack>
             <VStack alignItems="flex-start">
-              <Text>External link</Text>
+              <HStack>
+                <Text>Base URI</Text>
+                <ChakraLink
+                  href="https://github.com/0xnuggetz/sealkey"
+                  isExternal
+                >
+                  <InfoIcon opacity={0.8} />
+                </ChakraLink>
+              </HStack>
               <Input
                 className={styles.input}
-                onChange={handleExternalURLChange}
-                value={externalURL}
+                onChange={handleBaseURIChange}
+                value={baseURI}
               ></Input>
             </VStack>
             <VStack alignItems="flex-start">
-              <Text>Collection</Text>
+              <Text>Secrets (JSON)</Text>
               <Input
                 className={styles.input}
-                onChange={handleCollectionChange}
-                value={collection}
-                placeholder="SealKey Collection (default) "
+                onChange={handleRoyaltiesChange}
+                value={royalties.toString()}
+                placeholder={`{ 1: "message1", 2: "message2" }`}
               ></Input>
             </VStack>
-            <VStack alignItems="flex-start">
-              <Text>Secret</Text>
-              <Input
-                className={styles.input}
-                onClick={handleSecretChange}
-              ></Input>
-            </VStack>
-            <Box h="1rem"></Box>
-            <Button className={styles.button} onClick={handleListAsset}>
-              {isLoading ? <Spinner color="white" /> : "CREATE"}
-            </Button>
+            <Box h=".5rem"></Box>
+            <HStack w="100%" justifyContent="space-between">
+              <VStack>
+                <Text>Create mint drop</Text>
+                <Switch size="lg" colorScheme="blue" variant="custom" />
+              </VStack>
+              <Button className={styles.button} onClick={deployContract}>
+                {isLoading ? <Spinner color="white" /> : "CREATE"}
+              </Button>
+            </HStack>
           </VStack>
         </HStack>
       </VStack>
@@ -317,4 +287,4 @@ function CreateToken() {
   );
 }
 
-export default CreateToken;
+export default CreateCollection;
