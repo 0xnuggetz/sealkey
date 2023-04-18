@@ -26,9 +26,10 @@ const Home: NextPage = () => {
           <HStack className={styles.subtitleContainer}>
             <Box className={styles.fadeLeft}></Box>
             <Text className={styles.subtitle}>
-              EMPOWERING THE WEB3 CREATOR ECONOMY ON MANTLE NETWORK EMPOWERING
-              THE WEB3 CREATOR ECONOMY ON MANTLE NETWORK EMPOWERING THE WEB3
-              CREATOR ECONOMY ON MANTLE NETWORK
+              EMPOWERING REAL-WORLD ASSETS ON TRON NETWORK EMPOWERING REAL-WORLD
+              ASSETS ON TRON NETWORK EMPOWERING REAL-WORLD ASSETS ON TRON
+              NETWORK EMPOWERING REAL-WORLD ASSETS ON TRON NETWORK EMPOWERING
+              REAL-WORLD ASSETS ON TRON NETWORK
             </Text>
             <Box className={styles.fadeRight}></Box>
           </HStack>
@@ -37,6 +38,7 @@ const Home: NextPage = () => {
           <Button
             className={styles.connectButton}
             onClick={() => handleConnect(setLoading, setAddress, provider)}
+            cursor="pointer"
           >
             {isLoading ? <Spinner color="white" /> : "Connect Wallet"}
           </Button>
@@ -51,8 +53,8 @@ const Home: NextPage = () => {
                 className={styles.tokenImage}
               ></Image>
               <Text className={styles.description}>
-                Create your own NFT, a digital asset that represents ownership
-                of a unique item or piece of content.
+                Create your own keyToken, an NFT that stores a secret message
+                on-chain only accessible by the token holder.
               </Text>
 
               <Link href="/create?type=token">
@@ -67,8 +69,8 @@ const Home: NextPage = () => {
                 className={styles.collectionImage}
               ></Image>
               <Text className={styles.description}>
-                Create your own NFT collection, an entire series of digital
-                assets to share ownership with the world.
+                Create your own keyToken collection, a series of NFTs with
+                secrets only accessible by the respective holders.
               </Text>
               <Link href="/create?type=collection">
                 <Button className={styles.button}>CREATE COLLECTION</Button>

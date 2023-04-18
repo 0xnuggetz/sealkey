@@ -89,10 +89,10 @@ export async function handleConnect(setLoading, setAddress, provider) {
       method: "tron_requestAccounts",
     });
     if (provider && provider.defaultAddress) {
-      const fetchedUser = await fetchUser(provider.defaultAddress.base58);
-      if (!fetchedUser) {
-        await createUser(provider.defaultAddress.base58);
-      }
+      // const fetchedUser = await fetchUser(provider.defaultAddress.base58);
+      // if (!fetchedUser) {
+      //   await createUser(provider.defaultAddress.base58);
+      // }
       setTimeout(() => {
         setAddress(provider.defaultAddress.base58);
         setLoading(false);
