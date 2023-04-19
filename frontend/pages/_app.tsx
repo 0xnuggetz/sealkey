@@ -1,15 +1,19 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-
-import { useEffect, useState } from "react";
-import { Box, ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Navbar from "@components/Navbar";
 import Head from "next/head";
 import styles from "@styles/Home.module.css";
+import { useEffect, useState } from "react";
 import { TronProvider } from "@components/TronProvider";
-
 import { accordionAnatomy } from "@chakra-ui/anatomy";
+import { Box, ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
+
+declare global {
+  interface Window {
+    tronWeb: any;
+  }
+}
 
 const { definePartsStyle, defineMultiStyleConfig } =
   createMultiStyleConfigHelpers(accordionAnatomy.keys);

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "@styles/Navbar.module.css";
 import { Button, HStack, Image, Spinner } from "@chakra-ui/react";
-import { abridgeAddress } from "@utils/abridgeAddress";
+import { abridgeAddress } from "@utils/helpers";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useTron } from "./TronProvider";

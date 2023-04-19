@@ -133,6 +133,7 @@
   transition: all 0.3s ease-in-out;
   opacity: 0.7;
   cursor: pointer;
+  z-index: 10;
 }
 
 .connectButton:hover {

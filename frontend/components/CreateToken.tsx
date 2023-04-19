@@ -10,14 +10,15 @@ import {
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import styles from "../styles/Create.module.css";
-import { AddIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import { AddIcon, InfoIcon } from "@chakra-ui/icons";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Web3Storage } from "web3.storage";
 import SuccessLottie from "@components/SuccessLottie";
 import Link from "next/link";
 import { TokenMetadata } from "@utils/types";
 import { createAsset } from "@utils/web3";
 import { useTron } from "@components/TronProvider";
+import { abridgeFilename, isValidURL } from "@utils/helpers";
 
 const WEB3_STORAGE_TOKEN = process.env.NEXT_PUBLIC_WEB3_STORAGE_API_KEY;
 
@@ -28,19 +29,34 @@ const client = new Web3Storage({
 
 function CreateToken() {
   const { address } = useTron();
+  const [unsealedImage, setUnsealedImage] = useState<any>();
   const [uploadedImage, setUploadedImage] = useState<any>();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [collection, setCollection] = useState<string>("");
   const [externalURL, setExternalURL] = useState<string>("");
+  const [externalURLError, setExternalURLError] = useState<string>("");
+  const [secretMessage, setSecretMessage] = useState<string>("");
+  const [nextTokenId, setNextTokenId] = useState<string>("");
+  const [txnHash, setTxnHash] = useState<string>("");
   const [trait, setTrait] = useState<string>("");
   const [value, setValue] = useState<string>("");
-  const [txnHash, setTxnHash] = useState<string>("");
-  const [secret, setSecret] = useState<string>("");
+
+  const debounceTimeoutRef = useRef<any>();
+
+  function handleInputChange(setter) {
+    return (e) => {
+      setter(e.target.value);
+    };
+  }
 
   function handleImageUpload(e) {
     setUploadedImage(e.target.files[0]);
+  }
+
+  function handleUnsealedImageUpload(e) {
+    setUnsealedImage(e.target.files[0]);
   }
 
   function handleNameChange(e) {
@@ -56,7 +72,22 @@ function CreateToken() {
   }
 
   function handleExternalURLChange(e) {
-    setExternalURL(e.target.value);
+    const inputValue = e.target.value;
+    setExternalURL(inputValue);
+
+    setExternalURLError("");
+
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (isValidURL(inputValue) || inputValue === "") {
+        setExternalURLError("");
+      } else {
+        setExternalURLError("Invalid URL. Please enter a valid URL.");
+      }
+    }, 500); // Adjust the debounce time (in ms) as needed
   }
 
   function handleTraitChange(e) {
@@ -68,35 +99,38 @@ function CreateToken() {
   }
 
   function handleSecretChange(e) {
-    setSecret(e.target.value);
+    console.log("secret");
+    setSecretMessage(e.target.value);
   }
-
-  const NFT_ADDRESS = "";
 
   async function uploadImage() {
     if (!uploadedImage) return;
 
-    const blob = new Blob([uploadedImage], { type: "image/png" });
-    const imageToUpload = [new File([blob], "file.png")];
+    const fileType = uploadedImage.type || "image/png";
+    const fileExtension = fileType.split("/")[1] || "png";
+    const fileName = `file.${fileExtension}`;
+
+    const blob = new Blob([uploadedImage], { type: fileType });
+    const imageToUpload = [new File([blob], fileName)];
     const imageCID = await client.put(imageToUpload);
-    const imageLink = `https://${imageCID}.ipfs.w3s.link/file.png`;
+    const imageLink = `https://${imageCID}.ipfs.w3s.link/${fileName}`;
 
     return imageLink;
   }
 
-  const lastTokenId = 0;
-
   async function uploadJSON() {
-    const imageCID = await uploadImage();
+    const imageURL = await uploadImage();
 
-    // construct JSON metadata object
-    const jsonObject: TokenMetadata = {
+    const metadataJSON: TokenMetadata = {
       name: name,
       description: description,
       collection: collection != "" ? collection : "SealKey Collection 1",
       external_url: externalURL,
       image:
-        imageCID ??
+        imageURL ??
+        "https://bafybeie6rfxujzadhx5t3ofso6sckg33jknl5vhobmgby7uetpmbzaojvm.ipfs.w3s.link/preview.png",
+      original_image:
+        imageURL ??
         "https://bafybeie6rfxujzadhx5t3ofso6sckg33jknl5vhobmgby7uetpmbzaojvm.ipfs.w3s.link/preview.png",
       attributes: [
         {
@@ -106,48 +140,97 @@ function CreateToken() {
       ],
     };
 
-    const blob = new Blob([JSON.stringify(jsonObject)], {
+    const blob = new Blob([JSON.stringify(metadataJSON)], {
       type: "application/json",
     });
 
     const files = [new File([blob], "metadata.json")];
     const jsonCID = await client.put(files);
-    const jsonLink = `https://${jsonCID}.ipfs.w3s.link/metadata.json`;
+    const metadataURL = `https://${jsonCID}.ipfs.w3s.link/metadata.json`;
 
-    return { jsonLink, jsonObject };
+    return { metadataURL, metadataJSON };
   }
 
-  // const handleMint = () => {}
+  const secretTokenAddress = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
 
-  // async function handleListAsset() {
-  //   setLoading(true);
-  //   const { jsonLink: uploadedJSON, jsonObject: metadata } = await uploadJSON();
-  //   console.log("TokenMetadata successfully uploaded to IPFS: ", uploadedJSON);
-  //   const nftResult = await handleMint(uploadedJSON);
+  const fetchEncryptedMessage = async (message) => {
+    const response = await fetch("http://localhost:8888/oracle/encrypt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message }),
+    });
 
-  // if (nftResult) {
-  //   await createAsset(
-  //     NFT_ADDRESS,
-  //     (parseInt(lastTokenId as string, 10) + 1).toString(),
-  //     metadata,
-  //     address
-  //   );
-  // }
-  //   setLoading(false);
-  // }
+    if (response.ok) {
+      const encryptedMessage = await response.text();
+      return encryptedMessage;
+    } else {
+      throw new Error("Error fetching encrypted message");
+    }
+  };
 
-  // const navigationLink = useMemo(
-  //   () =>
-  //     lastTokenId
-  //       ? `/collection/${NFT_ADDRESS}/${
-  //           parseInt(lastTokenId as string, 10) + 1
-  //         }`
-  //       : `/collection/${NFT_ADDRESS}`,
-  //   [NFT_ADDRESS, lastTokenId]
-  // );
+  const handleMintToken = async () => {
+    setLoading(true);
+    console.log("address: ", address);
+    console.log("secretMessage: ", secretMessage);
+    if (!address || !secretMessage) return null;
 
-  const navigationLink = "";
-  const handleListAsset = () => {};
+    try {
+      const encryptedMessage = await fetchEncryptedMessage(secretMessage);
+      console.log("encryptedMessage: ", encryptedMessage);
+
+      const contractInstance = await window.tronWeb
+        .contract()
+        .at(secretTokenAddress);
+
+      const { metadataURL, metadataJSON } = await uploadJSON();
+      console.log("metadataURL: ", metadataURL);
+
+      const transaction = await contractInstance
+        .mintWithSecret(address, encryptedMessage, metadataURL)
+        .send();
+
+      if (transaction) {
+        await createAsset(
+          secretTokenAddress,
+          nextTokenId,
+          metadataJSON,
+          address
+        );
+        setTxnHash(transaction);
+      }
+      setLoading(false);
+
+      console.log("Transaction successful:", transaction);
+      return transaction;
+    } catch (error) {
+      console.error("Error while minting token:", error);
+      return null;
+    }
+  };
+
+  const navigationLink = useMemo(
+    () =>
+      nextTokenId
+        ? `/collection/${secretTokenAddress}/${nextTokenId}`
+        : `/collection/${secretTokenAddress}`,
+    [secretTokenAddress, nextTokenId]
+  );
+
+  const fetchNextTokenId = useCallback(async () => {
+    const secretTokenContract = await window.tronWeb
+      .contract()
+      .at(secretTokenAddress);
+
+    const tokenId = await secretTokenContract.getLastTokenId().call();
+    const newTokenId = (parseInt(tokenId, 10) + 1).toString();
+    setNextTokenId(newTokenId);
+  }, []);
+
+  useEffect(() => {
+    fetchNextTokenId();
+  }, [fetchNextTokenId]);
 
   if (!address) {
     return (
@@ -180,7 +263,7 @@ function CreateToken() {
 
           <HStack>
             <ChakraLink
-              href={`https://tronscan.org/#/transaction/${txnHash}`}
+              href={`https://shasta.tronscan.org/#/transaction/${txnHash}`}
               isExternal
             >
               <Button className={styles.successButton}>View transaction</Button>
@@ -203,7 +286,32 @@ function CreateToken() {
         <HStack gap={10} alignItems="flex-start">
           <VStack gap={2}>
             <VStack>
-              <Text w="100%">Media</Text>
+              <HStack w="100%" justifyContent="space-between">
+                <Text w="100%">Media</Text>
+                <VStack className={styles.uploadUnsealedContainer}>
+                  <HStack>
+                    {unsealedImage ? (
+                      <Text className={styles.uploadUnsealedTitle}>
+                        {abridgeFilename(unsealedImage.name)}
+                      </Text>
+                    ) : (
+                      <Text className={styles.uploadUnsealedTitle}>
+                        Add unsealed image
+                      </Text>
+                    )}
+                    <InfoIcon opacity={0.8} />
+                  </HStack>
+                  <input
+                    type="file"
+                    name="images"
+                    id="images"
+                    required
+                    multiple
+                    onChange={handleUnsealedImageUpload}
+                    className={styles.uploadUnsealedInput}
+                  />
+                </VStack>
+              </HStack>
               {!uploadedImage ? (
                 <VStack className={styles.uploadContainer}>
                   <input
@@ -249,7 +357,7 @@ function CreateToken() {
                   <Text className={styles.inputSubtitle}>Trait name</Text>
                   <Input
                     className={styles.subinput}
-                    onChange={handleTraitChange}
+                    onChange={handleInputChange(setTrait)}
                     value={trait}
                   ></Input>
                 </VStack>
@@ -257,7 +365,7 @@ function CreateToken() {
                   <Text className={styles.inputSubtitle}>Value</Text>
                   <Input
                     className={styles.subinput}
-                    onChange={handleValueChange}
+                    onChange={handleInputChange(setValue)}
                     value={value}
                   ></Input>
                 </VStack>
@@ -269,7 +377,7 @@ function CreateToken() {
               <Text>Name</Text>
               <Input
                 className={styles.input}
-                onChange={handleNameChange}
+                onChange={handleInputChange(setName)}
                 value={name}
               ></Input>
             </VStack>
@@ -278,7 +386,7 @@ function CreateToken() {
 
               <Input
                 className={styles.input}
-                onChange={handleDescriptionChange}
+                onChange={handleInputChange(setDescription)}
                 value={description}
               ></Input>
             </VStack>
@@ -289,12 +397,15 @@ function CreateToken() {
                 onChange={handleExternalURLChange}
                 value={externalURL}
               ></Input>
+              {externalURLError && (
+                <Text className={styles.error}>{externalURLError}</Text>
+              )}
             </VStack>
             <VStack alignItems="flex-start">
               <Text>Collection</Text>
               <Input
                 className={styles.input}
-                onChange={handleCollectionChange}
+                onChange={handleInputChange(setCollection)}
                 value={collection}
                 placeholder="SealKey Collection (default) "
               ></Input>
@@ -303,11 +414,12 @@ function CreateToken() {
               <Text>Secret</Text>
               <Input
                 className={styles.input}
-                onClick={handleSecretChange}
+                onChange={handleInputChange(setSecretMessage)}
+                value={secretMessage}
               ></Input>
             </VStack>
             <Box h="1rem"></Box>
-            <Button className={styles.button} onClick={handleListAsset}>
+            <Button className={styles.button} onClick={handleMintToken}>
               {isLoading ? <Spinner color="white" /> : "CREATE"}
             </Button>
           </VStack>

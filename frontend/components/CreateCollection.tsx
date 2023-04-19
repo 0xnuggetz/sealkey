@@ -156,7 +156,7 @@ function CreateCollection() {
 
           <HStack>
             <ChakraLink
-              href={`https://explorer.testnet.mantle.xyz/address/${publishedContract}`}
+              href={`https://shasta.tronscan.org/#/contract/${publishedContract}/code`}
               isExternal
             >
               <Button className={styles.successButton}>View contract</Button>

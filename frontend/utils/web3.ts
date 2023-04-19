@@ -8,7 +8,7 @@ const SEALKEY_API_URL =
 async function fetchUser(address: string) {
   if (!address) return;
   try {
-    const response = await fetch(`${SEALKEY_API_URL}/api/users/${address}`);
+    const response = await fetch(`${SEALKEY_API_URL}/users/${address}`);
     if (response.status === 200) {
       const user = await response.json();
       return user;
@@ -27,7 +27,7 @@ async function createUser(address: string) {
         address: address,
       }),
     };
-    await fetch(`${SEALKEY_API_URL}/api/users/new`, requestOptions);
+    await fetch(`${SEALKEY_API_URL}/users/new`, requestOptions);
   } catch (err) {
     console.log(err);
   }

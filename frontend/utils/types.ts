@@ -14,6 +14,7 @@ export type TokenMetadata = {
   collection: string;
   external_url: string;
   image: string;
+  original_image: string;
   attributes: Attribute[];
 };
 
