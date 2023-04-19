@@ -1,0 +1,228 @@
+.main {
+  min-height: 100vh;
+  padding: 0rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.tokenContainer {
+  width: 444px;
+  background: #000000;
+  border: 0.5px solid #363636;
+  box-shadow: 0px 2px 15px rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+
+  background: linear-gradient(black, black) padding-box,
+    linear-gradient(to bottom right, rgb(60, 60, 60), rgb(0, 0, 0)) border-box !important;
+  border-radius: 50px !important;
+  border: 1px solid transparent !important;
+
+  overflow: hidden;
+  animation: bounce 3s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.image {
+  width: 100%;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 24px;
+
+  color: #ffffff;
+}
+
+.description {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  padding-bottom: 10px;
+
+  color: #bdbdbd;
+}
+
+.explorerIcon {
+  opacity: 0.5;
+  width: 30px;
+  height: 30px;
+  transition: 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.explorerIcon:hover {
+  opacity: 1;
+}
+
+.ipfsIcon {
+  opacity: 50%;
+  width: 30px;
+  height: 30px;
+  transition: 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.ipfsIcon:hover {
+  opacity: 80%;
+}
+
+.webIcon {
+  opacity: 50%;
+  width: 24px;
+  height: 24px;
+  transition: 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.webIcon:hover {
+  opacity: 80%;
+}
+
+.tokenDetailContainer {
+  width: 100%;
+  align-items: flex-start !important;
+  padding: 1rem 2rem 0 2rem;
+}
+
+.fieldContainer {
+  align-items: flex-start !important;
+}
+
+.fieldContainerPadded {
+  align-items: flex-start !important;
+  width: 100%;
+  padding: 0.2rem 0;
+}
+
+.header {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 14px;
+
+  color: #bdbdbd;
+}
+
+.value {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+
+  color: #bdbdbd;
+}
+
+.divider {
+  width: 221px;
+  height: 0.5px;
+  background: linear-gradient(
+    90deg,
+    rgba(217, 217, 217, 0) 0%,
+    #d9d9d9 33.33%,
+    #d9d9d9 65.1%,
+    rgba(217, 217, 217, 0) 100%,
+    rgba(217, 217, 217, 0) 100%
+  );
+  opacity: 0.5;
+}
+
+.unsealButton {
+  width: 100% !important;
+  height: 50px !important;
+  background: linear-gradient(rgb(20, 20, 20), rgb(20, 20, 20)) padding-box,
+    linear-gradient(to bottom right, rgb(207, 207, 207), rgb(28, 28, 28))
+      border-box !important;
+  border-radius: 50px !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s ease-in-out;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.unsealButton:hover {
+  opacity: 1;
+}
+
+.modalOverlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.modalBody {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0 2rem;
+}
+
+.modalContent {
+  max-width: 400px !important;
+
+  background-color: black !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25px !important;
+  padding: 1rem 0 2rem 0;
+}
+
+.modalHeader {
+  text-align: center;
+}
+
+.modalContentContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.secretContainer {
+  position: relative;
+}
+
+.secretMessage {
+  position: absolute;
+  color: black;
+  top: 40px;
+  font-size: 14px;
+}
+
+.scratch {
+  width: 100%;
+  height: 120px;
+}
+
+.unsealed {
+  filter: grayscale(100%);
+}
+
+.lock {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  bottom: 10px;
+  right: 10px;
+}
+
+.tokenImageContainer {
+  width: 100%;
+  position: relative;
+}

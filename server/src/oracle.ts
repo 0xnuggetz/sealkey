@@ -82,17 +82,24 @@ oracle.post("/unseal", async (req: Request, res: Response) => {
       return;
     }
 
+    const secretTokenContract = await tronWeb.contract().at(secretTokenAddress);
+
     const recoveredAddress = await tronWeb.trx.verifyMessageV2(
       message,
       signature
     );
 
-    const secretTokenContract = await tronWeb.contract().at(secretTokenAddress);
+    const sealedStatus = await secretTokenContract
+      .getSealedStatus(tokenId)
+      .call();
 
     if (recoveredAddress === address) {
-      await secretTokenContract.unsealToken(tokenId).send();
+      if (sealedStatus) {
+        await secretTokenContract.unsealToken(tokenId).send();
+      }
 
       const secretKey = await getSecretKey(tokenId);
+
       const encryptedMessage = await secretTokenContract
         .getSecret(tokenId)
         .call();

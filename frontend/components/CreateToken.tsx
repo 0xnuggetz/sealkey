@@ -20,6 +20,8 @@ import { createAsset } from "@utils/web3";
 import { useTron } from "@components/TronProvider";
 import { abridgeFilename, isValidURL } from "@utils/helpers";
 
+const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
+
 const WEB3_STORAGE_TOKEN = process.env.NEXT_PUBLIC_WEB3_STORAGE_API_KEY;
 
 const client = new Web3Storage({
@@ -151,8 +153,6 @@ function CreateToken() {
     return { metadataURL, metadataJSON };
   }
 
-  const secretTokenAddress = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
-
   const fetchEncryptedMessage = async (message) => {
     const response = await fetch("http://localhost:8888/oracle/encrypt", {
       method: "POST",
@@ -182,7 +182,7 @@ function CreateToken() {
 
       const contractInstance = await window.tronWeb
         .contract()
-        .at(secretTokenAddress);
+        .at(SECRET_TOKEN_ADDRESS);
 
       const { metadataURL, metadataJSON } = await uploadJSON();
       console.log("metadataURL: ", metadataURL);
@@ -193,7 +193,7 @@ function CreateToken() {
 
       if (transaction) {
         await createAsset(
-          secretTokenAddress,
+          SECRET_TOKEN_ADDRESS,
           nextTokenId,
           metadataJSON,
           address
@@ -213,15 +213,15 @@ function CreateToken() {
   const navigationLink = useMemo(
     () =>
       nextTokenId
-        ? `/collection/${secretTokenAddress}/${nextTokenId}`
-        : `/collection/${secretTokenAddress}`,
-    [secretTokenAddress, nextTokenId]
+        ? `/collection/${SECRET_TOKEN_ADDRESS}/${nextTokenId}`
+        : `/collection/${SECRET_TOKEN_ADDRESS}`,
+    [nextTokenId]
   );
 
   const fetchNextTokenId = useCallback(async () => {
     const secretTokenContract = await window.tronWeb
       .contract()
-      .at(secretTokenAddress);
+      .at(SECRET_TOKEN_ADDRESS);
 
     const tokenId = await secretTokenContract.getLastTokenId().call();
     const newTokenId = (parseInt(tokenId, 10) + 1).toString();
@@ -407,7 +407,7 @@ function CreateToken() {
                 className={styles.input}
                 onChange={handleInputChange(setCollection)}
                 value={collection}
-                placeholder="SealKey Collection (default) "
+                placeholder="SealKey Collection (default)"
               ></Input>
             </VStack>
             <VStack alignItems="flex-start">

@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import {
   HStack,
   VStack,
@@ -10,52 +11,70 @@ import {
   AccordionButton,
   AccordionPanel,
   Spinner,
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
-import withTransition from "@components/withTransition";
 import styles from "@styles/Token.module.css";
-import { abridgeAddress } from "@utils/helpers";
 import Link from "next/link";
+import * as crypto from "crypto";
 import { useRouter } from "next/router";
-import { useContractRead } from "wagmi";
-import SilicateNFT from "@data/SilicateNFT.json";
-import { useCallback, useEffect, useState } from "react";
+import { abridgeAddress } from "@utils/helpers";
+import { useTron } from "@components/TronProvider";
+
+const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
 
 function Asset() {
   const router = useRouter();
+  const { address } = useTron();
+  const [owner, setOwner] = useState<string>();
+  const [sealedStatus, setSealedStatus] = useState<boolean>();
+  const [tokenURI, setTokenURI] = useState<string>();
   const [metadata, setMetadata] = useState<any>();
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [secret, setSecret] = useState<string>("false");
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { id: collectionAddress, tid: tokenId } = router.query;
 
-  const { data: tokenURI } = useContractRead({
-    address:
-      (collectionAddress as `0x${string}`) ??
-      "0xB499Bc2AD48b86fd4AA9C94e081C213eDFD4bDf2",
-    abi: SilicateNFT.abi,
-    functionName: "tokenURI",
-    args: [tokenId ?? "1"],
-  });
+  console.log("collectionAddress: ", collectionAddress);
+  console.log("tokenId: ", tokenId);
 
-  const { data: owner } = useContractRead({
-    address:
-      (collectionAddress as `0x${string}`) ??
-      "0xB499Bc2AD48b86fd4AA9C94e081C213eDFD4bDf2",
-    abi: SilicateNFT.abi,
-    functionName: "ownerOf",
-    args: [tokenId ?? "1"],
-  });
+  const fetchSealedStatus = useCallback(async () => {
+    const secretTokenContract = await window.tronWeb
+      .contract()
+      .at(SECRET_TOKEN_ADDRESS);
+
+    const status = await secretTokenContract.getSealedStatus(tokenId).call();
+    setSealedStatus(status);
+  }, [tokenId]);
+
+  const fetchOwner = useCallback(async () => {
+    const secretTokenContract = await window.tronWeb
+      .contract()
+      .at(SECRET_TOKEN_ADDRESS);
+
+    const owner = await secretTokenContract.ownerOf(tokenId).call();
+    const base58Owner = window.tronWeb.address.fromHex(owner);
+    setOwner(base58Owner);
+  }, [tokenId]);
 
   const fetchToken = useCallback(async () => {
-    if (!tokenURI) return;
+    const secretTokenContract = await window.tronWeb
+      .contract()
+      .at(SECRET_TOKEN_ADDRESS);
+
+    const tokenURI = await secretTokenContract.tokenURI(tokenId).call();
+    setTokenURI(tokenURI);
+
     const response = await fetch(tokenURI as string);
     const result = await response.json();
-
     setMetadata(result);
-  }, [tokenURI]);
-
-  useEffect(() => {
-    if (!metadata) {
-      fetchToken();
-    }
-  }, [fetchToken, metadata]);
+  }, [tokenId]);
 
   async function signMessage(message) {
     try {
@@ -73,7 +92,7 @@ function Asset() {
   }
 
   const handleUnsealToken = async () => {
-    const tokenId = 3;
+    setLoading(true);
     const message = crypto.randomBytes(32).toString("hex");
 
     if (!address) return null;
@@ -93,18 +112,40 @@ function Asset() {
         body: JSON.stringify({ address, tokenId, message, signature }),
       });
 
-      console.log("response: ", response);
-
       if (response.ok) {
-        console.log("Unseal request successful:", response.json());
-        return response.json();
+        const decryptedMessage = await response.text();
+        setSecret(decryptedMessage);
+        setSealedStatus(false);
+        onOpen();
       } else {
-        throw new Error("Error unsealing token");
+        throw new Error("Error fetching encrypted message");
       }
+
+      setLoading(false);
     } catch (error) {
       console.error("Error while unsealing token:", error);
     }
   };
+
+  useEffect(() => {
+    if (tokenId && !metadata) {
+      fetchToken();
+    }
+    if (tokenId && !owner) {
+      fetchOwner();
+    }
+    if (tokenId && !sealedStatus) {
+      fetchSealedStatus();
+    }
+  }, [
+    fetchOwner,
+    fetchSealedStatus,
+    fetchToken,
+    metadata,
+    owner,
+    sealedStatus,
+    tokenId,
+  ]);
 
   if (!tokenId || !metadata || !owner)
     return (
@@ -113,26 +154,35 @@ function Asset() {
       </VStack>
     );
 
-  console.log("metadata: ", metadata);
-
   return (
     <VStack className={styles.main}>
       <VStack className={styles.tokenContainer}>
-        <Image
-          alt="mantle token"
-          src={
-            !metadata.image.startsWith("ipfs://")
-              ? metadata.image
-              : `https:ipfs.io/ipfs/${metadata.image.split("//")[1]}`
-          }
-          className={styles.image}
-        ></Image>
+        <VStack className={styles.tokenImageContainer}>
+          <Image
+            alt="token image"
+            src={
+              !metadata.image.startsWith("ipfs://")
+                ? metadata.image
+                : `https:ipfs.io/ipfs/${metadata.image.split("//")[1]}`
+            }
+            className={`${styles.image} ${
+              !sealedStatus ? styles.unsealed : ""
+            }`}
+          ></Image>
+          {!sealedStatus && (
+            <Image
+              alt="token image"
+              src="/unsealed.png"
+              className={styles.lock}
+            ></Image>
+          )}
+        </VStack>
         <VStack className={styles.tokenDetailContainer}>
           <HStack w="100%" justifyContent="space-between">
             <Text className={styles.name}>{metadata.name}</Text>
             <HStack>
               <ChakraLink
-                href={`https://explorer.testnet.mantle.xyz/token/${collectionAddress}/instance/${tokenId}/token-transfers`}
+                href={`https://shasta.tronscan.org/#/token721/${collectionAddress}/${tokenId}`}
                 isExternal
               >
                 <Image
@@ -168,9 +218,14 @@ function Asset() {
                 >
                   <VStack className={styles.fieldContainer}>
                     <Text className={styles.header}>OWNED BY</Text>
-                    <Text className={styles.value}>
-                      {abridgeAddress(owner as string)}
-                    </Text>
+                    <ChakraLink
+                      href={`https://shasta.tronscan.org/#/address/${owner}`}
+                      isExternal
+                    >
+                      <Text className={styles.value}>
+                        {abridgeAddress(owner as string)}
+                      </Text>
+                    </ChakraLink>
                   </VStack>
 
                   <Text className={styles.header}>View details</Text>
@@ -189,10 +244,11 @@ function Asset() {
                           <Text className={styles.value}>
                             {metadata.collection
                               ? metadata.collection
-                              : "Azuki (Mantle Edition)"}
+                              : "SealKey Collection 1"}
                           </Text>
                         </Link>
                       </VStack>
+                      <Box w="3rem" />
                       <VStack className={styles.fieldContainerPadded}>
                         <Text className={styles.header}>TOKEN ID</Text>
                         <Text className={styles.value}>{tokenId}</Text>
@@ -205,12 +261,27 @@ function Asset() {
                           {abridgeAddress(collectionAddress as string)}
                         </Text>
                       </VStack>
+                      <Box w="3rem" />
                       <VStack className={styles.fieldContainerPadded}>
-                        <Text className={styles.header}>CREATOR ROYALTIES</Text>
-                        <Text className={styles.value}>5%</Text>
+                        <Text className={styles.header}>STATUS</Text>
+                        <Text className={styles.value}>
+                          {sealedStatus ? "SEALED" : "UNSEALED"}
+                        </Text>
                       </VStack>
                     </HStack>
-                    <Button onClick={handleUnsealToken}>Unseal Token</Button>
+                    <Box h=".5rem" />
+                    <Button
+                      onClick={handleUnsealToken}
+                      className={styles.unsealButton}
+                    >
+                      {isLoading ? (
+                        <Spinner color="white" />
+                      ) : !sealedStatus ? (
+                        "VIEW SECRET"
+                      ) : (
+                        "UNSEAL"
+                      )}
+                    </Button>
                   </VStack>
                 }
               </AccordionPanel>
@@ -218,8 +289,27 @@ function Asset() {
           </Accordion>
         </VStack>
       </VStack>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay className={styles.modalOverlay} />
+        <ModalContent className={styles.modalContent}>
+          <ModalHeader className={styles.modalHeader}>
+            View Your Secret
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack className={styles.secretContainer}>
+              <Image
+                src="/scratch.png"
+                className={styles.scratch}
+                alt="scratch"
+              ></Image>
+              <Text className={styles.secretMessage}>{secret}</Text>
+            </VStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </VStack>
   );
 }
 
-export default withTransition(Asset);
+export default Asset;

@@ -8,29 +8,17 @@ import {
   Spinner,
   Button,
 } from "@chakra-ui/react";
-import withTransition from "@components/withTransition";
-import { collections, tokens } from "@data/static";
+// import { collections } from "@data/static";
 import styles from "@styles/Collection.module.css";
 import { abridgeAddress } from "@utils/helpers";
-import {
-  useAccount,
-  useContractRead,
-  useContractWrite,
-  usePrepareContractWrite,
-  useProvider,
-} from "wagmi";
-import NewNFT from "@data/NewNFT.json";
-import SilicateNFT from "@data/SilicateNFT.json";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import SuccessLottie from "@components/SuccessLottie";
-import { ethers } from "ethers";
 
 function Collection() {
   const router = useRouter();
-  const { address } = useAccount();
-  const provider = useProvider();
+  const { address } = useTron();
   const [collectionMetadata, setCollectionMetadata] = useState<any>();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [tokens, setTokens] = useState<any[]>([]);
