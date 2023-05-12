@@ -24,7 +24,6 @@ export const TronProvider = ({ children }: any) => {
   const [balance, setBalance] = useState("");
   let provider: any = null;
 
-  // @ts-expect-errorts-ignore
   if (typeof window !== "undefined" && typeof window.tronWeb !== "undefined") {
     provider = window["tronWeb"];
   }
