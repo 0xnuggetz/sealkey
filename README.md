@@ -10,6 +10,8 @@ The repository consists of the following components:
 2. **Smart Contract:** A Solidity-based TRC721 token implementation that includes functionality for minting tokens with encrypted secret messages, and unsealing tokens to reveal the secret messages.
 3. **Server:** An Express.js server that handles encryption and decryption of secret messages using AES, and interacts with the TRON blockchain.
 
+Read more about the SecretToken contract [here](/tronbox/README.md).
+
 ### Client Side Code
 
 The client side code is a React application that provides the user with the ability to connect to their TRON wallet, enter a secret message, and mint a token with the encrypted secret message. The user can also unseal tokens by providing a signed message.
@@ -36,5 +38,5 @@ The server is an Express.js application that handles the following tasks:
 - TRON
 - TronWeb
 - Express.js
-- Firebase Firestore
+- Firebase
 - CryptoJS
