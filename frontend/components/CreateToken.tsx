@@ -408,6 +408,8 @@ function CreateToken() {
                 onChange={handleInputChange(setCollection)}
                 value={collection}
                 placeholder="SealKey Collection (default)"
+                _placeholder={{ color: "white" }}
+                disabled
               ></Input>
             </VStack>
             <VStack alignItems="flex-start">

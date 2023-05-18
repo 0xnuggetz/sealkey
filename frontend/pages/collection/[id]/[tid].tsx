@@ -41,9 +41,6 @@ function Asset() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { id: collectionAddress, tid: tokenId } = router.query;
 
-  console.log("collectionAddress: ", collectionAddress);
-  console.log("tokenId: ", tokenId);
-
   const fetchSealedStatus = useCallback(async () => {
     const secretTokenContract = await window.tronWeb
       .contract()

@@ -1,6 +1,6 @@
 .main {
   min-height: 100vh;
-  padding: 6rem 0 0 0;
+  padding: 6rem 3rem;
   display: flex;
   flex-direction: column;
   justify-content: center !important;
@@ -50,10 +50,11 @@
 }
 
 .gridContainer {
-  width: 90%;
-  overflow-y: scroll;
-  height: 88vh;
-  padding: 0 0 2rem 0;
+  width: 100%;
+  padding: 2rem;
+  justify-content: center;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
 }
 
 .title {
@@ -124,7 +125,6 @@
 
 .detailContainer {
   width: 50%;
-  height: 84vh;
   justify-content: space-between !important;
   padding: 0 4rem;
 }
@@ -142,7 +142,6 @@
 }
 
 .tokenCardContainer {
-  width: 200px;
   background: #000000;
   border: 0.5px solid #363636;
 
@@ -203,4 +202,55 @@
 .mintLabel {
   font-size: 14px;
   opacity: 0.7;
+}
+
+.collectionImageContainer {
+  position: relative;
+  width: 100%;
+  margin-bottom: 80px;
+}
+
+.collectionCoverImageContainer {
+  width: 100%;
+  height: 262px;
+  overflow: hidden;
+  border: 1px solid #2c2c2c;
+  border-radius: 25px;
+}
+
+.collectionCoverImage {
+  width: 100%;
+}
+
+.collectionProfileImage {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 1px solid #2c2c2c;
+}
+
+.profileImageContainer {
+  position: absolute;
+  bottom: -100px;
+  left: 80px;
+  align-items: flex-start !important;
+}
+
+.tronIcon {
+  height: 30px;
+  opacity: 0.75;
+}
+
+.username {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 20px;
+  color: #d9d9d9;
+}
+
+.divider {
+  background-color: #2b2b2b;
+  width: 100%;
+  height: 1px;
+  z-index: 10;
 }

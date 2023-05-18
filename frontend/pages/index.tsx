@@ -69,11 +69,11 @@ const Home: NextPage = () => {
                 className={styles.collectionImage}
               ></Image>
               <Text className={styles.description}>
-                Create your own keyToken collection, a series of NFTs with
-                secrets only accessible by the respective holders.
+                View my Secret NFT collection, unlock the secrets only
+                accessible through my private key signature.
               </Text>
-              <Link href="/create?type=collection">
-                <Button className={styles.button}>CREATE COLLECTION</Button>
+              <Link href="/mycollection">
+                <Button className={styles.button}>VIEW MY COLLECTION</Button>
               </Link>
             </VStack>
           </HStack>
