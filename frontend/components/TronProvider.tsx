@@ -31,11 +31,16 @@ export const TronProvider = ({ children }: any) => {
   // hook to handle address changes
   useEffect(() => {
     const fetchedAddress = window.localStorage.getItem("TRON_ADDRESS");
-    if (!address && fetchedAddress) setAddress(fetchedAddress);
+    console.log("here1");
+    if (!address && fetchedAddress) {
+      console.log("here2");
+      setAddress(fetchedAddress);
+    }
     if (address && address !== fetchedAddress)
       window.localStorage.setItem("TRON_ADDRESS", address);
   }, [address]);
 
+  console.log("address in provider: ", address);
   return (
     <TronContext.Provider value={{ provider, address, setAddress, balance }}>
       {children}
