@@ -192,3 +192,41 @@
     rgba(217, 217, 217, 0) 100%
   );
 }
+
+.modalContent {
+  max-width: 800px !important;
+
+  background-color: #000000 !important;
+  border: 1px solid #211e27;
+  border-radius: 25px !important;
+  padding: 1rem 0 2rem 0;
+}
+
+.modalHeader {
+  text-align: center;
+}
+.modalContentContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.modalOverlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.modalBody {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0 2rem;
+}
+
+.modalBtn {
+  background-color: black !important;
+  border: 1px solid #211e27 !important;
+  border-radius: 10px !important;
+}

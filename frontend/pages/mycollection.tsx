@@ -5,6 +5,7 @@ import {
   Image,
   SimpleGrid,
   Spinner,
+  Button,
 } from "@chakra-ui/react";
 import styles from "@styles/Collection.module.css";
 import Link from "next/link";
@@ -73,8 +74,6 @@ function Collection() {
     );
   }
 
-  console.log("isLoading: ", isLoading);
-
   return (
     <VStack className={styles.main} gap={8}>
       <VStack className={styles.collectionImageContainer}>
@@ -107,6 +106,13 @@ function Collection() {
       {isLoading ? (
         <VStack className={styles.gridContainer}>
           <Spinner color="white" size="lg" />
+        </VStack>
+      ) : tokens.length === 0 ? (
+        <VStack className={styles.gridContainer}>
+          <Text>You have no secret tokens on Sealkey.</Text>
+          <Link href="/create?type=token">
+            <Button className={styles.button}>MINT YOUR FIRST TOKEN</Button>
+          </Link>
         </VStack>
       ) : (
         <VStack className={styles.gridContainer}>

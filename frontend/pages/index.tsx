@@ -8,15 +8,41 @@ import {
   Box,
   VStack,
   Spinner,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useTron } from "@components/TronProvider";
 import { handleConnect } from "@utils/web3";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Home: NextPage = () => {
   const { address, setAddress, provider } = useTron();
   const [isLoading, setLoading] = useState<boolean>(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [dismissed, setDismissed] = useState(() => {
+    const localDismissed = window.localStorage.getItem("modalDismissed");
+    return localDismissed === "true";
+  });
+
+  useEffect(() => {
+    if (!dismissed) {
+      onOpen();
+    }
+  }, [dismissed, onOpen]);
+
+  const handleClose = () => {
+    window.localStorage.setItem("modalDismissed", "true");
+    setDismissed(true);
+    onClose();
+  };
 
   return (
     <div className={styles.container}>
@@ -56,7 +82,6 @@ const Home: NextPage = () => {
                 Create your own keyToken, an NFT that stores a secret message
                 on-chain only accessible by the token holder.
               </Text>
-
               <Link href="/create?type=token">
                 <Button className={styles.button}>CREATE TOKEN</Button>
               </Link>
@@ -79,6 +104,41 @@ const Home: NextPage = () => {
           </HStack>
         </main>
       )}
+      <Modal onClose={onClose} isOpen={isOpen} isCentered>
+        <ModalOverlay className={styles.modalOverlay} />
+        <ModalContent className={styles.modalContent}>
+          <ModalHeader className={styles.modalHeader}>
+            We have exciting news!
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack gap={3}>
+              <Text>
+                The SealKey team is proud to share that our project won the 4th
+                place award in the NFT category at the 2023 TRON Hackathon
+                Season 4.
+              </Text>
+              <ChakraLink
+                href="https://forum.trondao.org/t/hackatron-s4-2023-winners-announcements/19094"
+                isExternal
+              >
+                <Image alt="hackatron" src="/hackatron.png" />
+              </ChakraLink>
+              <Text>
+                As a result, we have officially launched our application on TRON
+                Mainnet! We hope to have many more exciting features developed
+                on our application in the coming months. We would like to thank
+                the TRON Community for their ongoing support.
+              </Text>
+            </VStack>
+          </ModalBody>
+          <ModalFooter justifyContent="center">
+            <Button onClick={handleClose} className={styles.modalBtn}>
+              Don&apos;t see again
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

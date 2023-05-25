@@ -10,7 +10,7 @@ import {
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import styles from "../styles/Create.module.css";
-import { AddIcon, InfoIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Web3Storage } from "web3.storage";
 import SuccessLottie from "@components/SuccessLottie";
@@ -18,7 +18,7 @@ import Link from "next/link";
 import { TokenMetadata } from "@utils/types";
 import { createAsset } from "@utils/web3";
 import { useTron } from "@components/TronProvider";
-import { abridgeFilename, isValidURL } from "@utils/helpers";
+import { isValidURL } from "@utils/helpers";
 
 const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
 
@@ -31,7 +31,6 @@ const client = new Web3Storage({
 
 function CreateToken() {
   const { address } = useTron();
-  const [unsealedImage, setUnsealedImage] = useState<any>();
   const [uploadedImage, setUploadedImage] = useState<any>();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
@@ -57,22 +56,6 @@ function CreateToken() {
     setUploadedImage(e.target.files[0]);
   }
 
-  function handleUnsealedImageUpload(e) {
-    setUnsealedImage(e.target.files[0]);
-  }
-
-  function handleNameChange(e) {
-    setName(e.target.value);
-  }
-
-  function handleDescriptionChange(e) {
-    setDescription(e.target.value);
-  }
-
-  function handleCollectionChange(e) {
-    setCollection(e.target.value);
-  }
-
   function handleExternalURLChange(e) {
     const inputValue = e.target.value;
     setExternalURL(inputValue);
@@ -89,20 +72,7 @@ function CreateToken() {
       } else {
         setExternalURLError("Invalid URL. Please enter a valid URL.");
       }
-    }, 500); // Adjust the debounce time (in ms) as needed
-  }
-
-  function handleTraitChange(e) {
-    setTrait(e.target.value);
-  }
-
-  function handleValueChange(e) {
-    setValue(e.target.value);
-  }
-
-  function handleSecretChange(e) {
-    console.log("secret");
-    setSecretMessage(e.target.value);
+    }, 500);
   }
 
   async function uploadImage() {
@@ -172,20 +142,16 @@ function CreateToken() {
 
   const handleMintToken = async () => {
     setLoading(true);
-    console.log("address: ", address);
-    console.log("secretMessage: ", secretMessage);
     if (!address || !secretMessage) return null;
 
     try {
       const encryptedMessage = await fetchEncryptedMessage(secretMessage);
-      console.log("encryptedMessage: ", encryptedMessage);
 
       const contractInstance = await window.tronWeb
         .contract()
         .at(SECRET_TOKEN_ADDRESS);
 
       const { metadataURL, metadataJSON } = await uploadJSON();
-      console.log("metadataURL: ", metadataURL);
 
       const transaction = await contractInstance
         .mintWithSecret(address, encryptedMessage, metadataURL)
@@ -288,29 +254,6 @@ function CreateToken() {
             <VStack>
               <HStack w="100%" justifyContent="space-between">
                 <Text w="100%">Media</Text>
-                <VStack className={styles.uploadUnsealedContainer}>
-                  <HStack>
-                    {unsealedImage ? (
-                      <Text className={styles.uploadUnsealedTitle}>
-                        {abridgeFilename(unsealedImage.name)}
-                      </Text>
-                    ) : (
-                      <Text className={styles.uploadUnsealedTitle}>
-                        Add unsealed image
-                      </Text>
-                    )}
-                    <InfoIcon opacity={0.8} />
-                  </HStack>
-                  <input
-                    type="file"
-                    name="images"
-                    id="images"
-                    required
-                    multiple
-                    onChange={handleUnsealedImageUpload}
-                    className={styles.uploadUnsealedInput}
-                  />
-                </VStack>
               </HStack>
               {!uploadedImage ? (
                 <VStack className={styles.uploadContainer}>
