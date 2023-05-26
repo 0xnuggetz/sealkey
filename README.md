@@ -2,6 +2,8 @@
 
 This repository contains the source code for SealKey, a decentralized application built on the TRON blockchain, which allows users to mint unique tokens with a secret message encrypted within them. The secret message can only be revealed by the owner of the token.
 
+![](/frontend/public/landing.png)
+
 ## Overview
 
 The repository consists of the following components:
