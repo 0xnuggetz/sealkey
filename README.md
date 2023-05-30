@@ -4,6 +4,10 @@ This repository contains the source code for SealKey, a decentralized applicatio
 
 ![](/frontend/public/landing.png)
 
+Deploy Secret Token contracts:
+- TRON Mainnet: [TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw](https://tronscan.org/#/address/TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw)
+- TRON Shasta Testnet: [TCAPAECoeJL2wxBVQ1u2De7mMKAoo85ZbX](https://shasta.tronscan.org/#/address/TCAPAECoeJL2wxBVQ1u2De7mMKAoo85ZbX)
+
 ## Overview
 
 The repository consists of the following components:
