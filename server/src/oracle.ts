@@ -8,7 +8,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const secretTokenAddress = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
+const secretTokenAddress = "TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw";
 
 export const oracle = express.Router();
 
