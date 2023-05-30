@@ -19,6 +19,7 @@ import { TokenMetadata } from "@utils/types";
 import { createAsset } from "@utils/web3";
 import { useTron } from "@components/TronProvider";
 import { isValidURL } from "@utils/helpers";
+import { SEALKEY_API_URL } from "../utils/web3";
 
 const SECRET_TOKEN_ADDRESS = "TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw";
 
@@ -124,7 +125,7 @@ function CreateToken() {
   }
 
   const fetchEncryptedMessage = async (message) => {
-    const response = await fetch("http://localhost:8888/oracle/encrypt", {
+    const response = await fetch(`${SEALKEY_API_URL}/oracle/encrypt`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

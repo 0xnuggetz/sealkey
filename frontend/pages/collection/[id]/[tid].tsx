@@ -26,6 +26,7 @@ import * as crypto from "crypto";
 import { useRouter } from "next/router";
 import { abridgeAddress } from "@utils/helpers";
 import { useTron } from "@components/TronProvider";
+import { SEALKEY_API_URL } from "../../../utils/web3";
 
 const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
 
@@ -101,7 +102,7 @@ function Asset() {
         throw new Error("Error signing message");
       }
 
-      const response = await fetch("http://localhost:8888/oracle/unseal", {
+      const response = await fetch(`${SEALKEY_API_URL}/oracle/unseal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

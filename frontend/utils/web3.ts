@@ -1,6 +1,6 @@
 import { TokenMetadata } from "./types";
 
-const SEALKEY_API_URL =
+export const SEALKEY_API_URL =
   process.env.NEXT_PUBLIC_ENV === "prod"
     ? process.env.NEXT_PUBLIC_API_PROD
     : process.env.NEXT_PUBLIC_API_DEV;
