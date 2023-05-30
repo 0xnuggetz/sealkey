@@ -20,7 +20,7 @@ import { createAsset } from "@utils/web3";
 import { useTron } from "@components/TronProvider";
 import { isValidURL } from "@utils/helpers";
 
-const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
+const SECRET_TOKEN_ADDRESS = "TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw";
 
 const WEB3_STORAGE_TOKEN = process.env.NEXT_PUBLIC_WEB3_STORAGE_API_KEY;
 
@@ -229,7 +229,7 @@ function CreateToken() {
 
           <HStack>
             <ChakraLink
-              href={`https://shasta.tronscan.org/#/transaction/${txnHash}`}
+              href={`https://tronscan.org/#/transaction/${txnHash}`}
               isExternal
             >
               <Button className={styles.successButton}>View transaction</Button>

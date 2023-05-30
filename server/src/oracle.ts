@@ -13,7 +13,7 @@ const secretTokenAddress = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
 export const oracle = express.Router();
 
 const tronWeb = new TronWeb({
-  fullHost: "https://api.shasta.trongrid.io",
+  fullHost: "https://api.trongrid.io",
   privateKey: process.env.PRIVATE_KEY,
 });
 

@@ -179,7 +179,7 @@ function Asset() {
             <Text className={styles.name}>{metadata.name}</Text>
             <HStack>
               <ChakraLink
-                href={`https://shasta.tronscan.org/#/token721/${collectionAddress}/${tokenId}`}
+                href={`https://tronscan.org/#/token721/${collectionAddress}/${tokenId}`}
                 isExternal
               >
                 <Image
@@ -216,7 +216,7 @@ function Asset() {
                   <VStack className={styles.fieldContainer}>
                     <Text className={styles.header}>OWNED BY</Text>
                     <ChakraLink
-                      href={`https://shasta.tronscan.org/#/address/${owner}`}
+                      href={`https://tronscan.org/#/address/${owner}`}
                       isExternal
                     >
                       <Text className={styles.value}>
