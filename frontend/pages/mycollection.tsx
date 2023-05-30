@@ -13,7 +13,7 @@ import { abridgeAddress } from "@utils/helpers";
 import { useTron } from "@components/TronProvider";
 import { useCallback, useEffect, useState } from "react";
 
-const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
+const SECRET_TOKEN_ADDRESS = "TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw";
 
 function Collection() {
   const { address } = useTron();

@@ -28,7 +28,7 @@ import { abridgeAddress } from "@utils/helpers";
 import { useTron } from "@components/TronProvider";
 import { SEALKEY_API_URL } from "../../../utils/web3";
 
-const SECRET_TOKEN_ADDRESS = "TMBdWU9ek3XYpAJFc887Uk17bDKg69zFFV";
+const SECRET_TOKEN_ADDRESS = "TY32c2eSKPY6hNigxMTcCFcYtF8eU95saw";
 
 function Asset() {
   const router = useRouter();
